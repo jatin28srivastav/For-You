@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+
+<style>
+
+body{
+margin:0;
+height:100vh;
+font-family:Arial;
+text-align:center;
+background:linear-gradient(135deg,#ff9ecb,#ffc1da);
+overflow:hidden;
+transition:all 0.6s ease;
+}
+
+h1{
+margin-top:120px;
+font-size:42px;
+color:white;
+transition:all 0.4s ease;
+}
+
+#container{
+margin-top:40px;
+display:flex;
+justify-content:center;
+gap:40px;
+transition:all 0.4s ease;
+}
+
+button{
+font-size:20px;
+padding:15px 35px;
+border:none;
+border-radius:30px;
+cursor:pointer;
+transition:all 0.4s ease;
+box-shadow:0 6px 12px rgba(0,0,0,0.2);
+}
+
+#yesBtn{
+background:#ff3b7a;
+color:white;
+}
+
+#yesBtn:hover{
+transform:scale(1.1);
+}
+
+#noBtn{
+background:white;
+color:#ff3b7a;
+}
+
+/* floating hearts */
+
+.heart{
+position:absolute;
+color:#ff2d75;
+font-size:24px;
+animation:float 8s linear infinite;
+}
+
+@keyframes float{
+from{
+transform:translateY(100vh);
+opacity:1;
+}
+to{
+transform:translateY(-10vh);
+opacity:0;
+}
+}
+
+/* heart explosion */
+
+.explosion{
+position:absolute;
+color:#ff2d75;
+font-size:22px;
+pointer-events:none;
+animation:explode 1s ease-out forwards;
+}
+
+@keyframes explode{
+0%{
+transform:scale(1) translate(0,0);
+opacity:1;
+}
+100%{
+transform:scale(2) translate(var(--x),var(--y));
+opacity:0;
+}
+}
+
+/* falling roses */
+
+.rose{
+position:absolute;
+font-size:30px;
+animation:fall 6s linear forwards;
+}
+
+@keyframes fall{
+0%{
+transform:translateY(-10vh) rotate(0deg);
+opacity:1;
+}
+100%{
+transform:translateY(110vh) rotate(360deg);
+opacity:0;
+}
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Will you be my valentine? ❤️</h1>
+
+<div id="container">
+<button id="yesBtn">Yes</button>
+<button id="noBtn">No</button>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+
+let yesBtn=document.getElementById("yesBtn")
+let noBtn=document.getElementById("noBtn")
+
+let stages=[
+"Are you positive",
+"Pookie please",
+"if you say no I feel really sad",
+"I will be very sad",
+"Please ???",
+"don't do this to me",
+"last chance!"
+]
+
+let step=0
+
+let clickCount=1
+const initialFont=20
+const initialPadY=15
+const initialPadX=35
+
+function growYes(){
+
+clickCount++
+
+yesBtn.style.fontSize=(initialFont*clickCount)+"px"
+yesBtn.style.padding=(initialPadY*clickCount)+"px "+(initialPadX*clickCount)+"px"
+
+}
+
+/* YES CLICK */
+
+yesBtn.onclick=function(){
+
+startConfetti()
+startRoses()
+
+document.body.innerHTML=
+"<h1 style='margin-top:200px;color:white'>Knew you would say yes ❤️</h1>"
+
+}
+
+/* heart explosion on hover */
+
+yesBtn.onmouseenter=function(){
+
+let rect=yesBtn.getBoundingClientRect()
+
+for(let i=0;i<20;i++){
+
+let heart=document.createElement("div")
+heart.className="explosion"
+heart.innerHTML="❤"
+
+let x=(Math.random()-0.5)*300+"px"
+let y=(Math.random()-0.5)*300+"px"
+
+heart.style.left=rect.left+rect.width/2+"px"
+heart.style.top=rect.top+rect.height/2+"px"
+
+heart.style.setProperty("--x",x)
+heart.style.setProperty("--y",y)
+
+document.body.appendChild(heart)
+
+setTimeout(()=>heart.remove(),1000)
+
+}
+
+}
+
+/* NO BUTTON LOGIC */
+
+noBtn.onclick=function(){
+
+growYes()
+
+if(step<stages.length){
+noBtn.innerText=stages[step]
+step++
+}
+
+if(noBtn.innerText==="last chance!"){
+
+noBtn.style.position="absolute"
+
+noBtn.onmouseover=function(){
+
+let x=Math.random()*(window.innerWidth-120)
+let y=Math.random()*(window.innerHeight-60)
+
+noBtn.style.left=x+"px"
+noBtn.style.top=y+"px"
+
+}
+
+}
+
+}
+
+/* floating hearts */
+
+function createHeart(){
+
+let heart=document.createElement("div")
+heart.className="heart"
+heart.innerHTML="❤"
+
+heart.style.left=Math.random()*100+"vw"
+heart.style.fontSize=(20+Math.random()*30)+"px"
+
+document.body.appendChild(heart)
+
+setTimeout(()=>heart.remove(),8000)
+
+}
+
+setInterval(createHeart,500)
+
+/* falling roses */
+
+function startRoses(){
+
+for(let i=0;i<40;i++){
+
+let rose=document.createElement("div")
+rose.className="rose"
+rose.innerHTML="🌹"
+
+rose.style.left=Math.random()*100+"vw"
+
+rose.style.animationDelay=(Math.random()*2)+"s"
+
+document.body.appendChild(rose)
+
+setTimeout(()=>rose.remove(),6000)
+
+}
+
+}
+
+/* confetti */
+
+function startConfetti(){
+
+let canvas=document.getElementById("confetti")
+let ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let pieces=[]
+
+for(let i=0;i<200;i++){
+pieces.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:5+Math.random()*10,
+speed:2+Math.random()*3
+})
+}
+
+function update(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+pieces.forEach(p=>{
+ctx.fillStyle="hsl("+Math.random()*360+",100%,50%)"
+ctx.fillRect(p.x,p.y,p.size,p.size)
+
+p.y+=p.speed
+if(p.y>canvas.height)p.y=0
+})
+
+requestAnimationFrame(update)
+}
+
+update()
+
+}
+
+</script>
+
+</body>
+</html>
